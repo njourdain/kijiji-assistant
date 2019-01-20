@@ -1,0 +1,9 @@
+{
+    "name": "kijiji-assistant",
+    "version": "0.0.1",
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "kijiji-scraper": "^4.0.4"
+    }
+}
