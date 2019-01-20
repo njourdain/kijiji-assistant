@@ -1,29 +1,23 @@
 const kijiji = require('kijiji-scraper');
-const https = require('https');
+const request = require('request');
 
 function getHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey) {
     return new Promise((resolve, reject) => {
-        https.get(
-            hashedProcessedAdsUrl,
+        request(
             {
+                url:hashedProcessedAdsUrl,
                 headers: {
                     'x-apikey': apiKey
                 }
             },
-            (resp) => {
-                let data = '';
-
-                resp.on('data', (chunk) => {
-                    data += chunk;
-                });
-
-                resp.on('end', () => {
-                    resolve(JSON.parse(data));
-                });
+            (error, response, body) => {
+                if (!error && response.statusCode == 200) {
+                    resolve(JSON.parse(body))
+                } else {
+                    reject(error || response.statusCode)
+                }
             }
-        ).on('error', (err) => {
-            reject(err.message);
-        });
+        );
     });
 }
  
