@@ -43,8 +43,14 @@ module.exports = async function (context, myTimer) {
 
     context.log(hashedProcessedAdUrls);
 
-    // Use the ads array
     for (let i = 0; i < ads.length; ++i) {
+        // if the first ad is not processed, send warning to slack
+
+        // send ad to slack
+
+        // update processed dictionary
         context.log(ads[i].title);
     }
+
+    // save dictionary
 };
