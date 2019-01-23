@@ -93,7 +93,7 @@ function sendAdToSlack(webhook, ad) {
 }
 
 function getHashFromString(string) {
-    crypto.createHash('md5').update(string).digest('hex');
+    return crypto.createHash('md5').update(string).digest('hex');
 }
  
 module.exports = async function (context, myTimer) {
