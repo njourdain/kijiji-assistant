@@ -106,7 +106,7 @@ module.exports = async function (context, myTimer) {
         await sendWarningToSlack(process.env['SlackWebhook'], ad.title);
 
         // update processed dictionary
-        hashedProcessedAdUrls.hash = true;
+        hashedProcessedAdUrls[hash] = true;
     }
 
     context.log(hashedProcessedAdUrls);
