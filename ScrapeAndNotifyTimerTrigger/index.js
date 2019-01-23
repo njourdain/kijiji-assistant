@@ -76,8 +76,13 @@ function sendAdToSlack(webhook, ad) {
                         fallback: ad.title,
                         title: ad.title,
                         title_link: ad.url,
-                        text: ad.description,
-                        image_url: ad.image
+                        text: ad.description.substring(0, 50),
+                        image_url: ad.image,
+                        fields: [{
+                            title: 'Price',
+                            value: ad.attributes.price,
+                            short: true
+                        }]
                     }]
                 }
             },
