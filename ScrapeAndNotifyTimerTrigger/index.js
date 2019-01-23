@@ -1,11 +1,12 @@
 const kijiji = require('kijiji-scraper');
 const request = require('request');
+const crypto = require('crypto');
 
 function getHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey) {
     return new Promise((resolve, reject) => {
         request(
             {
-                url:hashedProcessedAdsUrl,
+                url: hashedProcessedAdsUrl,
                 headers: {
                     'x-apikey': apiKey
                 }
@@ -19,6 +20,53 @@ function getHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey) {
             }
         );
     });
+}
+
+function saveHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey, data) {
+    return new Promise((resolve, reject) => {
+        request.put(
+            {
+                url: hashedProcessedAdsUrl,
+                headers: {
+                    'x-apikey': apiKey
+                },
+                json: true,
+                body: data
+            },
+            (error, response, body) => {
+                if (!error && response.statusCode == 200) {
+                    resolve(JSON.parse(body))
+                } else {
+                    reject(error || response.statusCode)
+                }
+            }
+        );
+    });
+}
+
+function sendWarningToSlack(webhook, warning) {
+    return new Promise((resolve, reject) => {
+        request.post(
+            {
+                url: webhook,
+                json: true,
+                body: {
+                    text: warning
+                }
+            },
+            (error, response, body) => {
+                if (!error && response.statusCode == 200) {
+                    resolve(JSON.parse(body))
+                } else {
+                    reject(error || response.statusCode)
+                }
+            }
+        );
+    });
+}
+
+function getHashFromString(string) {
+    crypto.createHash('md5').update(string).digest('hex');
 }
  
 module.exports = async function (context, myTimer) {
@@ -44,13 +92,28 @@ module.exports = async function (context, myTimer) {
     context.log(hashedProcessedAdUrls);
 
     for (let i = 0; i < ads.length; ++i) {
-        // if the first ad is not processed, send warning to slack
+        const ad = ads[i];
+        const hash = getHashFromString(ad.url);
+
+        if (i === (ads.length - 1) && !hashedProcessedAdUrls[hash]) {
+            await sendWarningToSlack(
+                process.env['SlackWebhook'],
+                'The last retrieved message was new, older ads might be worth checking!'
+            );
+        }
 
         // send ad to slack
+        await sendWarningToSlack(process.env['SlackWebhook'], ad.title);
 
         // update processed dictionary
-        context.log(ads[i].title);
+        hashedProcessedAdUrls.hash = true;
     }
 
-    // save dictionary
+    context.log(hashedProcessedAdUrls);
+
+    // await saveHashedProcessedAdUrls(
+    //     process.env['HashedProcessedAdsUrl'],
+    //     process.env['RestdbApiKey'],
+    //     hashedProcessedAdUrls
+    // );
 };
