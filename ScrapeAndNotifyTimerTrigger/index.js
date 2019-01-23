@@ -56,7 +56,7 @@ function sendWarningToSlack(webhook, warning) {
             },
             (error, response, body) => {
                 if (!error && response.statusCode == 200) {
-                    resolve(JSON.parse(body))
+                    resolve(true)
                 } else {
                     reject(error || response.statusCode)
                 }
