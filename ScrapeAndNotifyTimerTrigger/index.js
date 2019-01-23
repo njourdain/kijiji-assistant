@@ -100,8 +100,8 @@ function sendAdToSlack(webhook, ad) {
 function getHashFromString(string) {
     return crypto.createHash('md5').update(string).digest('hex');
 }
- 
-module.exports = async function (context, myTimer) {
+
+async function scrapeAndNotify(searchTerm, slackWebhook, hashedProcessedAdUrls) {
     let options = {
         minResults: 20
     };
@@ -110,16 +110,11 @@ module.exports = async function (context, myTimer) {
         locationId: kijiji.locations.QUEBEC.GREATER_MONTREAL.CITY_OF_MONTREAL,
         categoryId: kijiji.categories.REAL_ESTATE.APARTMENTS_AND_CONDOS_FOR_RENT,
         sortByName: 'dateDesc',
-        keywords: 'villeray',
+        keywords: searchTerm,
         minPrice: 1000
     };
 
     const ads = await kijiji.search(params, options);
-
-    const hashedProcessedAdUrls = await getHashedProcessedAdUrls(
-        process.env['HashedProcessedAdsUrl'],
-        process.env['RestdbApiKey']
-    );
 
     for (let i = 0; i < ads.length; ++i) {
         const ad = ads[i];
@@ -131,17 +126,28 @@ module.exports = async function (context, myTimer) {
 
         if (i === (ads.length - 1) && !hashedProcessedAdUrls[hash]) {
             await sendWarningToSlack(
-                process.env['SlackWebhook'],
+                slackWebhook,
                 'The last retrieved message was new, older ads might be worth checking!'
             );
         }
 
         // send ad to slack
-        await sendAdToSlack(process.env['SlackWebhook'], ad);
+        await sendAdToSlack(slackWebhook, ad);
 
         // update processed dictionary
         hashedProcessedAdUrls[hash] = true;
     }
+};
+ 
+module.exports = async function (context, myTimer) {
+    const hashedProcessedAdUrls = await getHashedProcessedAdUrls(
+        process.env['HashedProcessedAdsUrl'],
+        process.env['RestdbApiKey']
+    );
+
+    await scrapeAndNotify('villeray', proccess.env['SlackWebhookVilleray'], hashedProcessedAdUrls);
+    await scrapeAndNotify('jean+talon', proccess.env['SlackWebhookJeanTalon'], hashedProcessedAdUrls);
+    await scrapeAndNotify('beaubien', proccess.env['SlackWebhookBeaubien'], hashedProcessedAdUrls);
 
     await saveHashedProcessedAdUrls(
         process.env['HashedProcessedAdsUrl'],
