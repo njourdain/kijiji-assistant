@@ -121,8 +121,6 @@ module.exports = async function (context, myTimer) {
         process.env['RestdbApiKey']
     );
 
-    context.log(ads[0]);
-
     for (let i = 0; i < ads.length; ++i) {
         const ad = ads[i];
         const hash = getHashFromString(ad.url);
@@ -141,11 +139,9 @@ module.exports = async function (context, myTimer) {
         hashedProcessedAdUrls[hash] = true;
     }
 
-    context.log(hashedProcessedAdUrls);
-
-    // await saveHashedProcessedAdUrls(
-    //     process.env['HashedProcessedAdsUrl'],
-    //     process.env['RestdbApiKey'],
-    //     hashedProcessedAdUrls
-    // );
+    await saveHashedProcessedAdUrls(
+        process.env['HashedProcessedAdsUrl'],
+        process.env['RestdbApiKey'],
+        hashedProcessedAdUrls
+    );
 };
