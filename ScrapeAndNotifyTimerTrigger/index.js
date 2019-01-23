@@ -65,6 +65,33 @@ function sendWarningToSlack(webhook, warning) {
     });
 }
 
+function sendAdToSlack(webhook, ad) {
+    return new Promise((resolve, reject) => {
+        request.post(
+            {
+                url: webhook,
+                json: true,
+                body: {
+                    attachments: [{
+                        fallback: ad.title,
+                        title: ad.title,
+                        title_link: ad.url,
+                        text: ad.description,
+                        image_url: ad.image
+                    }]
+                }
+            },
+            (error, response, body) => {
+                if (!error && response.statusCode == 200) {
+                    resolve(true)
+                } else {
+                    reject(error || response.statusCode)
+                }
+            }
+        );
+    });
+}
+
 function getHashFromString(string) {
     crypto.createHash('md5').update(string).digest('hex');
 }
@@ -103,7 +130,7 @@ module.exports = async function (context, myTimer) {
         }
 
         // send ad to slack
-        await sendWarningToSlack(process.env['SlackWebhook'], ad.title);
+        await sendAdToSlack(process.env['SlackWebhook'], ad);
 
         // update processed dictionary
         hashedProcessedAdUrls[hash] = true;
