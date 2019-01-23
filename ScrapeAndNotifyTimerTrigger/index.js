@@ -125,6 +125,10 @@ module.exports = async function (context, myTimer) {
         const ad = ads[i];
         const hash = getHashFromString(ad.url);
 
+        if (hashedProcessedAdUrls[hash]) {
+            continue;
+        }
+
         if (i === (ads.length - 1) && !hashedProcessedAdUrls[hash]) {
             await sendWarningToSlack(
                 process.env['SlackWebhook'],
