@@ -22,7 +22,7 @@ function getHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey) {
     });
 }
 
-function saveHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey, data, context) {
+function saveHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey, data) {
     return new Promise((resolve, reject) => {
         request.put(
             {
@@ -34,20 +34,13 @@ function saveHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey, data, context)
                 body: data
             },
             (error, response, body) => {
-                context.log('got a response!');
-                try {
-                    if (!error && response.statusCode == 200) {
-                        context.log('success');
-                        resolve(JSON.parse(body))
-                    } else {
-                        context.log('error');
-                        reject(error || response.statusCode)
-                    }
-                } catch (err) {
-                    context.log('exception');
-                    context.log(err);
-                    resolve();
-                }
+                // For some reason, JSON.parse throws an exception
+                // if (!error && response.statusCode == 200) {
+                //     resolve(JSON.parse(body))
+                // } else {
+                //     reject(error || response.statusCode)
+                // }
+                resolve();
             }
         );
     });
@@ -149,36 +142,20 @@ async function scrapeAndNotify(searchTerm, slackWebhook, hashedProcessedAdUrls) 
 };
  
 module.exports = async function (context, myTimer) {
-    context.log('getting urls');
     const hashedProcessedAdUrls = await getHashedProcessedAdUrls(
         process.env['HashedProcessedAdsUrl'],
         process.env['RestdbApiKey']
     );
 
-    context.log('scrapeAndNotify villeray');
     await scrapeAndNotify('villeray', process.env['SlackWebhookVilleray'], hashedProcessedAdUrls);
-
-    context.log('scrapeAndNotify jean+talon');
     await scrapeAndNotify('jean+talon', process.env['SlackWebhookJeanTalon'], hashedProcessedAdUrls);
-    
-    context.log('scrapeAndNotify beaubien');
     await scrapeAndNotify('beaubien', process.env['SlackWebhookBeaubien'], hashedProcessedAdUrls);
-    
-    context.log('scrapeAndNotify rosemont');
     await scrapeAndNotify('rosemont', process.env['SlackWebhookRosemont'], hashedProcessedAdUrls);
-    
-    context.log('scrapeAndNotify jarry');
     await scrapeAndNotify('jarry', process.env['SlackWebhookJarry'], hashedProcessedAdUrls);
 
-    context.log('setting urls');
     await saveHashedProcessedAdUrls(
         process.env['HashedProcessedAdsUrl'],
         process.env['RestdbApiKey'],
-        hashedProcessedAdUrls,
-        context
+        hashedProcessedAdUrls
     );
-
-    context.log('about to notify context we are done');
-    context.done();
-    context.log('done!');
 };
