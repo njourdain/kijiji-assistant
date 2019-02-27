@@ -22,7 +22,7 @@ function getHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey) {
     });
 }
 
-function saveHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey, data) {
+function saveHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey, data, context) {
     return new Promise((resolve, reject) => {
         request.put(
             {
@@ -34,9 +34,12 @@ function saveHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey, data) {
                 body: data
             },
             (error, response, body) => {
+                context.log('got a response!');
                 if (!error && response.statusCode == 200) {
+                    context.log('success');
                     resolve(JSON.parse(body))
                 } else {
+                    context.log('error');
                     reject(error || response.statusCode)
                 }
             }
@@ -165,7 +168,8 @@ module.exports = async function (context, myTimer) {
     await saveHashedProcessedAdUrls(
         process.env['HashedProcessedAdsUrl'],
         process.env['RestdbApiKey'],
-        hashedProcessedAdUrls
+        hashedProcessedAdUrls,
+        context
     );
 
     context.log('about to notify context we are done');
