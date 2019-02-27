@@ -35,12 +35,18 @@ function saveHashedProcessedAdUrls(hashedProcessedAdsUrl, apiKey, data, context)
             },
             (error, response, body) => {
                 context.log('got a response!');
-                if (!error && response.statusCode == 200) {
-                    context.log('success');
-                    resolve(JSON.parse(body))
-                } else {
-                    context.log('error');
-                    reject(error || response.statusCode)
+                try {
+                    if (!error && response.statusCode == 200) {
+                        context.log('success');
+                        resolve(JSON.parse(body))
+                    } else {
+                        context.log('error');
+                        reject(error || response.statusCode)
+                    }
+                } catch (err) {
+                    context.log('exception');
+                    context.log(err);
+                    resolve();
                 }
             }
         );
