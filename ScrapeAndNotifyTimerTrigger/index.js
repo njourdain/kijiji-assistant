@@ -157,5 +157,7 @@ module.exports = async function (context, myTimer) {
         hashedProcessedAdUrls
     );
 
+    console.log('about to notify context we are done');
     context.done();
+    console.log('done!');
 };
