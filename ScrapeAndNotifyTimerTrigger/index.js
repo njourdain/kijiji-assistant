@@ -156,4 +156,6 @@ module.exports = async function (context, myTimer) {
         process.env['RestdbApiKey'],
         hashedProcessedAdUrls
     );
+
+    context.done();
 };
