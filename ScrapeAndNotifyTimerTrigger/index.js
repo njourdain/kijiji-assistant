@@ -140,17 +140,28 @@ async function scrapeAndNotify(searchTerm, slackWebhook, hashedProcessedAdUrls) 
 };
  
 module.exports = async function (context, myTimer) {
+    context.log('getting urls');
     const hashedProcessedAdUrls = await getHashedProcessedAdUrls(
         process.env['HashedProcessedAdsUrl'],
         process.env['RestdbApiKey']
     );
 
+    context.log('scrapeAndNotify villeray');
     await scrapeAndNotify('villeray', process.env['SlackWebhookVilleray'], hashedProcessedAdUrls);
+
+    context.log('scrapeAndNotify jean+talon');
     await scrapeAndNotify('jean+talon', process.env['SlackWebhookJeanTalon'], hashedProcessedAdUrls);
+    
+    context.log('scrapeAndNotify beaubien');
     await scrapeAndNotify('beaubien', process.env['SlackWebhookBeaubien'], hashedProcessedAdUrls);
+    
+    context.log('scrapeAndNotify rosemont');
     await scrapeAndNotify('rosemont', process.env['SlackWebhookRosemont'], hashedProcessedAdUrls);
+    
+    context.log('scrapeAndNotify jarry');
     await scrapeAndNotify('jarry', process.env['SlackWebhookJarry'], hashedProcessedAdUrls);
 
+    context.log('setting urls');
     await saveHashedProcessedAdUrls(
         process.env['HashedProcessedAdsUrl'],
         process.env['RestdbApiKey'],
