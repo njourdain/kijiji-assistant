@@ -147,11 +147,13 @@ module.exports = async function (context, myTimer) {
         process.env['RestdbApiKey']
     );
 
-    await scrapeAndNotify('villeray', process.env['SlackWebhookVilleray'], hashedProcessedAdUrls);
-    await scrapeAndNotify('jean+talon', process.env['SlackWebhookJeanTalon'], hashedProcessedAdUrls);
-    await scrapeAndNotify('beaubien', process.env['SlackWebhookBeaubien'], hashedProcessedAdUrls);
-    await scrapeAndNotify('rosemont', process.env['SlackWebhookRosemont'], hashedProcessedAdUrls);
-    await scrapeAndNotify('jarry', process.env['SlackWebhookJarry'], hashedProcessedAdUrls);
+    await Promise.all([
+        scrapeAndNotify('villeray', process.env['SlackWebhookVilleray'], hashedProcessedAdUrls),
+        scrapeAndNotify('jean+talon', process.env['SlackWebhookJeanTalon'], hashedProcessedAdUrls),
+        scrapeAndNotify('beaubien', process.env['SlackWebhookBeaubien'], hashedProcessedAdUrls),
+        scrapeAndNotify('rosemont', process.env['SlackWebhookRosemont'], hashedProcessedAdUrls),
+        scrapeAndNotify('jarry', process.env['SlackWebhookJarry'], hashedProcessedAdUrls)
+    ]);
 
     await saveHashedProcessedAdUrls(
         process.env['HashedProcessedAdsUrl'],
